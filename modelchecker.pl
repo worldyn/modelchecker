@@ -38,12 +38,36 @@ check(T, L, S, U, ex(F)) :-
   member([S, NextStates], T), !,
   member(SN, NextStates), check(T, L, SN, U, F), !.
 % AG
-%check(_, _, S, U, ag(_)) :-
-%  member(S, U), !.
-%check(T, L, S, U, ag(F)) :-
-%  member([S, NextStates], T), !,
-
-
+check(_, _, S, U, ag(_)) :-
+  member(S, U), !.
+check(T, L, S, U, ag(F)) :-
+  member([S, NextStates], T), !,
+  forall(member(SN, NextStates), check(T, L, SN, [S|U], ag(F))).
 % EG
+check(_, _, S, U, eg(_)) :-
+  member(S, U), !.
+check(T, L, S, U, eg(F)) :-
+  check(T, L, S, U, F), !,
+  member([S, NextStates], T), !,
+  member(SN, NextStates), check(T, L, SN, [S|U], eg(F)), !.
 % EF
+check(T, L, S, U, ef(F)) :-
+  \+ member(S, U), !,
+  (
+    check(T, L, S, U, F), !
+  ) ;
+  (
+    member([S, NextStates], T), !,
+    member(SN, NextStates), check(T, L, SN, [S|U], ef(F)), !
+  ).
+
 % AF
+check(T, L, S, U, af(F)) :-
+  \+ member(S, U), !,
+  (
+    check(T, L, S, U, F), !
+  ) ;
+  (
+    member([S, NextStates], T), !,
+    forall(member(SN, NextStates), check(T, L, SN, [S|U], af(F)))
+  ).
