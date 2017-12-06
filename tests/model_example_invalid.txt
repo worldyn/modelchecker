@@ -1,0 +1,25 @@
+[[login, [menu,failedlogin]],
+[menu, [login, deposit,withdrawal]],
+[failedlogin, [login]],
+[deposit, [inserted]],
+[withdrawal, [enteredamount]],
+[inserted, [depositsuccess]],
+[enteredamount, [withdrawalsuccess]],
+[failedwithdrawal, [menu]],
+[depositsuccess, [menu]],
+[withdrawalsuccess, [menu]]].
+
+[[login, []],
+[menu, [v]],
+[failedlogin, [f]],
+[deposit, [d,v]],
+[withdrawal, [w,v]],
+[inserted, [d,v,m]],
+[enteredamount, [w,v,a]],
+[failedwithdrawal, [f,v]],
+[depositsuccess, [d,v,m,s]],
+[withdrawalsuccess, [w,v,a,s]]].
+
+withdrawal.
+
+ex(s).

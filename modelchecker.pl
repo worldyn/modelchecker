@@ -26,48 +26,47 @@ verify(Input) :-
 check(_, L, S, _, X) :- member([S, Vars], L), member(X, Vars).
 check(_, L, S, _, neg(X)) :- member([S, Vars], L), \+ member(X, Vars).
 % And
-check(T, L, S, U, and(F,G)) :- check(T, L, S, U, F), check(T, L, S, U, G).
+check(T, L, S, _, and(F,G)) :- check(T, L, S, [], F), check(T, L, S, [], G).
 % Or
-check(T, L, S, U, or(F,G)) :- check(T, L, S, U, F) ; check(T, L, S, U, G).
+check(T, L, S, _, or(F,G)) :- check(T, L, S, [], F) ; check(T, L, S, [], G).
 % AX
-check(T, L, S, U, ax(F)) :-
+check(T, L, S, _, ax(F)) :-
   member([S, NextStates], T), !,
-  forall(member(SN, NextStates), check(T, L, SN, U, F)).
+  forall(member(SN, NextStates), check(T, L, SN, [], F)).
 % EX
-check(T, L, S, U, ex(F)) :-
+check(T, L, S, _, ex(F)) :-
   member([S, NextStates], T), !,
-  member(SN, NextStates), check(T, L, SN, U, F), !.
+  member(SN, NextStates), check(T, L, SN, [], F).
 % AG
 check(_, _, S, U, ag(_)) :-
-  member(S, U), !.
+  member(S, U).
 check(T, L, S, U, ag(F)) :-
+  \+ member(S, U),
+  check(T, L, S, [], F), !,
   member([S, NextStates], T), !,
   forall(member(SN, NextStates), check(T, L, SN, [S|U], ag(F))).
 % EG
 check(_, _, S, U, eg(_)) :-
-  member(S, U), !.
+  member(S, U).
 check(T, L, S, U, eg(F)) :-
-  check(T, L, S, U, F), !,
+  \+ member(S, U),
+  check(T, L, S, [], F),
   member([S, NextStates], T), !,
-  member(SN, NextStates), check(T, L, SN, [S|U], eg(F)), !.
+  member(SN, NextStates),
+  check(T, L, SN, [S|U], eg(F)).
 % EF
 check(T, L, S, U, ef(F)) :-
-  \+ member(S, U), !,
-  (
-    check(T, L, S, U, F), !
-  ) ;
-  (
-    member([S, NextStates], T), !,
-    member(SN, NextStates), check(T, L, SN, [S|U], ef(F)), !
-  ).
-
+  \+ member(S, U),
+  check(T, L, S, [], F).
+check(T, L, S, U, ef(F)) :-
+  \+ member(S, U),
+  member([S, NextStates], T), !,
+  member(SN, NextStates), check(T, L, SN, [S|U], ef(F)).
 % AF
 check(T, L, S, U, af(F)) :-
-  \+ member(S, U), !,
-  (
-    check(T, L, S, U, F), !
-  ) ;
-  (
-    member([S, NextStates], T), !,
-    forall(member(SN, NextStates), check(T, L, SN, [S|U], af(F)))
-  ).
+  \+ member(S, U),
+  check(T, L, S, [], F).
+check(T, L, S, U, af(F)) :-
+  \+ member(S, U),
+  member([S, NextStates], T), !,
+  forall(member(SN, NextStates), check(T, L, SN, [S|U], af(F))).
